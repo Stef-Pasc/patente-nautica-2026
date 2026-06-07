@@ -106,6 +106,9 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
 .cat-answer{font-size:13px;color:var(--muted);padding:2px 0;line-height:1.4}
 .cat-answer.correct{color:var(--green);font-weight:600}
 .cat-item.open .cat-answers{display:flex}
+.cat-img{margin:8px 0 4px;display:none}
+.cat-item.open .cat-img{display:block}
+.cat-img img{max-width:100%;max-height:160px;border-radius:8px;border:1px solid var(--border)}
 .cat-item.open{border-color:var(--accent)}
 .cat-edit-btn{margin-left:auto;height:28px;padding:0 10px;border:1.5px solid var(--border);border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;background:none;color:var(--muted);touch-action:manipulation;transition:all .15s;flex-shrink:0}
 .cat-edit-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -360,14 +363,18 @@ function renderCatalog(){
       const isCor=i===q[3];
       return `<div class="cat-answer${isCor?' correct':''}">${isVela?a:(L[i]+') ')}${a}${isCor?' ✓':''}</div>`;
     }).join('');
+    const imgHtml=q[4]?`<div class="cat-img"><img src="${q[4]}" alt="figura"></div>`:'';
+    const camBadge=q[4]?'<span style="font-size:10px;background:#eff3ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:2px 7px;border-radius:10px;font-weight:600">📷</span>':'';
     return `<div class="cat-item" id="ci-${q[0]}" onclick="toggleCatItem('${q[0]}')">
       <div class="cat-item-header">
         <span class="cat-id">${q[0]}</span>
         <span class="cat-correct ${corClass}">${corLabel}</span>
+        ${camBadge}
         ${edited}
         <button class="cat-edit-btn" onclick="openEdit('${q[0]}',event)">✏️ Modifica</button>
       </div>
       <div class="cat-q">${q[1]}</div>
+      ${imgHtml}
       <div class="cat-answers">${answersHtml}</div>
     </div>`;
   }).join('');
@@ -390,7 +397,18 @@ function openEdit(id, e){
   const isVela=!!q[5];
   $('modal-qid').textContent='Quesito '+id+(isVela?' · Vela V/F':'');
   $('modal-q').value=q[1];
-  
+
+  // Image preview in modal
+  const existingPrev=$('modal-img-preview');
+  if(existingPrev) existingPrev.remove();
+  if(q[4]){
+    const prev=document.createElement('div');
+    prev.id='modal-img-preview';
+    prev.style.cssText='margin-bottom:16px;text-align:center';
+    prev.innerHTML=`<img src="${q[4]}" style="max-width:100%;max-height:140px;border-radius:8px;border:1px solid var(--border)">`;
+    $('modal-answers-container').before(prev);
+  }
+
   // Answer fields
   const L=['A','B','C'];
   $('modal-answers-container').innerHTML=isVela?''
