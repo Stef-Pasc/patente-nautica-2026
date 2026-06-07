@@ -144,13 +144,13 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
       <p>D.M. 323/2021</p>
     </div>
     <div class="header-nav">
-      <button class="nav-btn" id="nav-home" onclick="goScreen('home')">Quiz</button>
+      <button class="nav-btn" id="nav-home" class="nav-btn active" onclick="goScreen('home')">Quiz</button>
       <button class="nav-btn active" id="nav-catalog" onclick="goScreen('catalog')">Catalogo</button>
     </div>
   </header>
 
   <!-- HOME -->
-  <div id="screen-home" class="screen">
+  <div id="screen-home" class="screen active">
     <div class="home-card">
       <div class="home-title">Inizia il quiz</div>
       <div class="home-sub">Domande casuali in sequenza infinita. Scegli l'argomento e inizia.</div>
@@ -192,7 +192,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
   </div>
 
   <!-- CATALOG -->
-  <div id="screen-catalog" class="screen active">
+  <div id="screen-catalog" class="screen">
     <div class="catalog-bar">
       <input class="catalog-search" id="cat-search" type="search" placeholder="Cerca domanda…" oninput="renderCatalog()" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="catalog-filter" id="cf-all" onclick="setCatFilter('all')">Tutte</button>
