@@ -133,6 +133,27 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
 .modal-save{flex:1;height:48px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation}
 .modal-cancel{height:48px;padding:0 20px;background:none;color:var(--muted);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:15px;font-weight:500;cursor:pointer;touch-action:manipulation}
 .edited-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);display:inline-block;margin-left:4px;vertical-align:middle}
+
+/* MODE TABS */
+.mode-tabs{display:flex;gap:8px;margin-bottom:20px}
+.mode-tab{flex:1;height:44px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--muted);transition:all .15s;touch-action:manipulation}
+.mode-tab.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.home-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--light);margin-bottom:8px}
+/* SECTION GRID */
+.section-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px}
+.sec-btn{padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text);text-align:left;transition:all .15s;touch-action:manipulation;line-height:1.35}
+.sec-btn .sec-id{font-size:10px;color:var(--light);display:block;margin-bottom:2px;font-weight:700;letter-spacing:.5px}
+.sec-btn .sec-count{font-size:11px;color:var(--light)}
+.sec-btn.active{border-color:var(--accent);background:var(--accent-light)}
+.sec-btn.sel{border-color:var(--accent);background:var(--accent);color:#fff}
+.sec-btn.sel .sec-id,.sec-btn.sel .sec-count{color:rgba(255,255,255,.7)}
+
+/* JUMP MENU */
+.jump-menu{position:absolute;top:100%;right:16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:20;min-width:200px;padding:6px 0;max-height:60vh;overflow-y:auto}
+.jump-menu.hidden{display:none}
+.jump-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text);touch-action:manipulation;gap:12px}
+.jump-item:hover{background:var(--accent-light)}
+.jump-item .ji-count{font-size:11px;color:var(--light)}
 </style>
 </head>
 <body>
@@ -144,7 +165,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
       <p>D.M. 323/2021</p>
     </div>
     <div class="header-nav">
-      <button class="nav-btn" id="nav-home" class="nav-btn active" onclick="goScreen('home')">Quiz</button>
+      <button class="nav-btn" id="nav-home" onclick="goScreen('home')">Quiz</button>
       <button class="nav-btn active" id="nav-catalog" onclick="goScreen('catalog')">Catalogo</button>
     </div>
   </header>
@@ -152,17 +173,33 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
   <!-- HOME -->
   <div id="screen-home" class="screen active">
     <div class="home-card">
-      <div class="home-title">Inizia il quiz</div>
-      <div class="home-sub">Domande casuali in sequenza infinita. Scegli l'argomento e inizia.</div>
-      <div class="filter-group">
-        <button class="filter-btn active" id="f-all" onclick="setFilter('all')">Tutto</button>
-        <button class="filter-btn" id="f-motore" onclick="setFilter('motore')">Solo motore</button>
-        <button class="filter-btn" id="f-vela" onclick="setFilter('vela')">Solo vela</button>
+      <div class="home-title">Patente Nautica</div>
+      <div class="home-sub">Scegli la modalità di studio e l'argomento.</div>
+
+      <!-- MODE TABS -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="mode-random" onclick="setMode('random')">🔀 Casuale</button>
+        <button class="mode-tab" id="mode-order" onclick="setMode('order')">📋 In ordine</button>
       </div>
-      <button class="start-btn" onclick="startQuiz()">▶&nbsp;&nbsp;Inizia quiz</button>
+
+      <!-- TOPIC FILTER -->
+      <div class="home-label">Argomento</div>
+      <div class="filter-group">
+        <button class="filter-btn active" id="f-all"    onclick="setFilter('all')">Tutto</button>
+        <button class="filter-btn"        id="f-motore" onclick="setFilter('motore')">Solo motore</button>
+        <button class="filter-btn"        id="f-vela"   onclick="setFilter('vela')">Solo vela</button>
+      </div>
+
+      <!-- SECTION PICKER (shown only for motore/all in order mode) -->
+      <div id="section-picker" style="display:none">
+        <div class="home-label">Sezione <span id="sec-from-label" style="font-weight:400;color:var(--muted)"></span></div>
+        <div class="section-grid" id="section-grid"></div>
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">▶&nbsp;&nbsp;Inizia</button>
       <div class="info-pills">
-        <span class="info-pill">1446 domande teoria</span>
-        <span class="info-pill">252 domande vela V/F</span>
+        <span class="info-pill" id="pill-count"></span>
+        <span class="info-pill">252 domande vela</span>
         <span class="info-pill">118 con figura</span>
       </div>
     </div>
@@ -179,7 +216,11 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
         </div>
         <div class="streak" id="q-streak"></div>
       </div>
-      <button class="exit-btn" onclick="exitQuiz()">✕ Esci</button>
+      <div style="display:flex;gap:6px;position:relative">
+        <button class="exit-btn" id="jump-sec-btn" onclick="toggleJumpMenu()" style="display:none">☰ Sezioni</button>
+        <button class="exit-btn" onclick="exitQuiz()">✕ Esci</button>
+        <div id="jump-menu" class="jump-menu hidden"></div>
+      </div>
     </div>
     <div class="q-card">
       <div class="q-meta" id="q-meta"></div>
@@ -192,7 +233,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
   </div>
 
   <!-- CATALOG -->
-  <div id="screen-catalog" class="screen">
+  <div id="screen-catalog" class="screen active">
     <div class="catalog-bar">
       <input class="catalog-search" id="cat-search" type="search" placeholder="Cerca domanda…" oninput="renderCatalog()" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="catalog-filter" id="cf-all" onclick="setCatFilter('all')">Tutte</button>
@@ -16236,26 +16277,152 @@ function goScreen(name){
 }
 
 /* ── QUIZ ── */
-let filter='all', pool=[], idx=0, sel=null, done=false, nCorr=0, nWrong=0, streak=0;
+let filter='all', mode='random', selSection=null;
+let pool=[], idx=0, sel=null, done=false, nCorr=0, nWrong=0, streak=0;
+
+const SECTIONS = [
+  {id:'1.1.1',label:'Nomenclatura scafo'},
+  {id:'1.1.2',label:'Nomenclatura generale'},
+  {id:'1.2.1',label:'Motori e apparati'},
+  {id:'1.3.1',label:'Sicurezza'},
+  {id:'1.3.2',label:'Radiocomunicazioni'},
+  {id:'1.4.1',label:'Manovra'},
+  {id:'1.4.2',label:'Ormeggio'},
+  {id:'1.4.3',label:'Navigazione costiera'},
+  {id:'1.5.1',label:'Colregs'},
+  {id:'1.6.1',label:'Meteorologia'},
+  {id:'1.7.1',label:'Navigazione strumentale'},
+  {id:'1.8.1',label:'Normativa'},
+  {id:'1.8.2',label:'Normativa ambientale'},
+  {id:'vela',label:'Teoria della vela'},
+];
 
 function setFilter(f){
-  filter=f;
+  filter=f; selSection=null;
   ['all','motore','vela'].forEach(n=>$('f-'+n).classList.toggle('active',n===f));
+  updateSectionPicker();
+  updatePillCount();
 }
+
+function setMode(m){
+  mode=m;
+  ['random','order'].forEach(n=>$('mode-'+n).classList.toggle('active',n===m));
+  updateSectionPicker();
+}
+
+function updateSectionPicker(){
+  const picker=$('section-picker');
+  // Show section picker only in order mode for motore or all
+  if(mode==='order' && filter!=='vela'){
+    picker.style.display='block';
+    renderSectionGrid();
+  } else {
+    picker.style.display='none';
+    selSection=null;
+  }
+  updatePillCount();
+}
+
+function renderSectionGrid(){
+  const grid=$('section-grid');
+  const secs = filter==='vela' ? [] : SECTIONS.filter(s=>s.id!=='vela');
+  if(filter==='all') secs.push(SECTIONS.find(s=>s.id==='vela'));
+  grid.innerHTML = secs.map(s=>{
+    const count = s.id==='vela' ? VELA.length : DB.filter(q=>!q[5]&&q[0].startsWith(s.id+'.')).length;
+    const isSel = selSection===s.id;
+    return `<button class="sec-btn${isSel?' sel':''}" onclick="toggleSection('${s.id}')">
+      <span class="sec-id">${s.id==='vela'?'VELA':s.id}</span>
+      ${s.label}
+      <span class="sec-count">${count} domande</span>
+    </button>`;
+  }).join('');
+  $('sec-from-label').textContent = selSection ? '— da '+selSection : '— tutte (scorri per saltare sezione)';
+}
+
+function toggleSection(id){
+  selSection = selSection===id ? null : id;
+  renderSectionGrid();
+  updatePillCount();
+}
+
+function updatePillCount(){
+  const el=$('pill-count');
+  if(!el) return;
+  const base = getBasePool();
+  el.textContent = base.length + ' domande motore';
+}
+
+function getBasePool(){
+  let base = filter==='motore'?MOTORE:filter==='vela'?VELA:DB;
+  if(selSection){
+    base = selSection==='vela' ? VELA : base.filter(q=>!q[5]&&q[0].startsWith(selSection+'.'));
+  }
+  return base;
+}
+
 function buildPool(){
-  const base=filter==='motore'?MOTORE:filter==='vela'?VELA:DB;
-  pool=[...base].sort(()=>Math.random()-.5); idx=0;
+  let base = getBasePool();
+  if(mode==='random'){
+    pool=[...base].sort(()=>Math.random()-.5);
+  } else {
+    // Order mode: sort by ID
+    pool=[...base].sort((a,b)=>{
+      const pa=a[0].split('.').map(Number);
+      const pb=b[0].split('.').map(Number);
+      for(let i=0;i<Math.max(pa.length,pb.length);i++){
+        if((pa[i]||0)!==(pb[i]||0)) return (pa[i]||0)-(pb[i]||0);
+      }
+      return 0;
+    });
+  }
+  idx=0;
+}
+
+// Init section picker on load
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateSectionPicker();
+  updatePillCount();
+});
+function toggleJumpMenu(){
+  const menu=$('jump-menu');
+  if(!menu) return;
+  if(menu.classList.contains('hidden')){
+    const secsInPool={};
+    pool.forEach((q,i)=>{
+      const sec=q[5]?'vela':q[0].split('.').slice(0,3).join('.');
+      if(!secsInPool[sec]) secsInPool[sec]={first:i,count:0};
+      secsInPool[sec].count++;
+    });
+    const secNames={'1.1.1':'Nomenclatura scafo','1.1.2':'Nomenclatura gen.','1.2.1':'Motori','1.3.1':'Sicurezza','1.3.2':'Radio','1.4.1':'Manovra','1.4.2':'Ormeggio','1.4.3':'Nav. costiera','1.5.1':'Colregs','1.6.1':'Meteo','1.7.1':'Navigazione','1.8.1':'Normativa','1.8.2':'Ambiente','vela':'Vela V/F'};
+    menu.innerHTML=Object.entries(secsInPool).map(([sec,info])=>
+      `<div class="jump-item" onclick="jumpToSection(${info.first})"><span>${secNames[sec]||sec}</span><span class="ji-count">${info.count} dom.</span></div>`
+    ).join('');
+    menu.classList.remove('hidden');
+  } else {
+    menu.classList.add('hidden');
+  }
+}
+function jumpToSection(i){
+  idx=i; sel=null; done=false;
+  $('jump-menu').classList.add('hidden');
+  renderQ(); window.scrollTo(0,0);
 }
 function startQuiz(){
   nCorr=0;nWrong=0;streak=0;
   buildPool();
   goScreen('quiz');
+  const jb=$('jump-sec-btn');
+  if(jb) jb.style.display=mode==='order'?'block':'none';
   renderQ();
 }
 function exitQuiz(){goScreen('home');}
 function renderQ(){
   if(idx>=pool.length) buildPool();
   const q=pool[idx]; sel=null; done=false;
+  if(mode==='order'){
+    const totEl=$('q-tot');
+    if(totEl) totEl.textContent=(idx+1)+'/'+pool.length;
+  }
   const isVela=!!q[5];
   $('q-meta').innerHTML='Quesito '+q[0]+(isVela?'&ensp;<span class="vela-badge">VELA V/F</span>':'');
   $('q-text').textContent=q[1];
