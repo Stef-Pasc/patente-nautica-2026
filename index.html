@@ -187,7 +187,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
       <!-- MODE TABS -->
       <div class="mode-tabs">
         <button class="mode-tab" id="mode-random" onclick="setMode('random')">🔀 Casuale</button>
-        <button class="mode-tab active" id="mode-order" onclick="setMode('order')">📋 In ordine</button>
+        <button class="mode-tab active" id="mode-order" onclick="setMode('order')">📂 Per sezioni</button>
       </div>
 
       <!-- TOPIC FILTER -->
@@ -1646,7 +1646,7 @@ function renderSectionGrid(){
       <span class="sec-count">${count} domande</span>
     </button>`;
   }).join('');
-  $('sec-from-label').textContent = selSection ? '— da '+selSection : '— tutte (scorri per saltare sezione)';
+  $('sec-from-label').textContent = selSection ? '— da '+selSection : '— tutte le domande in ordine casuale';
 }
 
 function toggleSection(id){
@@ -1672,19 +1672,8 @@ function getBasePool(){
 
 function buildPool(){
   let base = getBasePool();
-  if(mode==='random'){
-    pool=[...base].sort(()=>Math.random()-.5);
-  } else {
-    // Order mode: sort by ID
-    pool=[...base].sort((a,b)=>{
-      const pa=a[0].split('.').map(Number);
-      const pb=b[0].split('.').map(Number);
-      for(let i=0;i<Math.max(pa.length,pb.length);i++){
-        if((pa[i]||0)!==(pb[i]||0)) return (pa[i]||0)-(pb[i]||0);
-      }
-      return 0;
-    });
-  }
+  // Both modes are random; "order" just restricts to a chosen section
+  pool=[...base].sort(()=>Math.random()-.5);
   idx=0;
 }
 
@@ -1722,7 +1711,7 @@ function startQuiz(){
   buildPool();
   goScreen('quiz');
   const jb=$('jump-sec-btn');
-  if(jb) jb.style.display=mode==='order'?'block':'none';
+  if(jb) jb.style.display='none';
   renderQ();
 }
 function exitQuiz(){goScreen('home');}
