@@ -364,7 +364,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
       <div class="ans-letter">C</div>
       <div class="ans-text">assicurare adeguatamente i suoi ormeggi nel mentre che mi accingevo ad ormeggiare la mia unità.</div>
     </button></div>
-    <div class="feedback" id="q-feedback" style="display: none;">✗ Errata. Corretta: emettendo 1 suono prolungato e ascoltando l’eventuale risposta.</div>
+    <div class="feedback" id="q-feedback" style="display: none;">✗ Risposta errata</div>
     <div class="q-nav"><button class="nav-arrow-btn" id="q-prev-btn" onclick="quizNavPrev()" disabled>← Prec</button><button class="nav-arrow-btn" id="q-next-btn" onclick="quizNavNext()" disabled>Succ →</button></div>
     <button class="confirm-btn" id="q-btn" onclick="handleBtn()" disabled="">Conferma</button>
   </div>
@@ -619,7 +619,7 @@ function renderExamQ(){
     }).join('');
     fb.className='feedback '+(sv.ok?'ok':'err');
     const epex=EXP[q[0]]?`<div class="exp-text">💡 ${EXP[q[0]]}</div>`:'';
-    fb.innerHTML=(sv.ok?'✓ Risposta corretta!':'✗ Errata. Corretta: <strong>'+q[2][sv.cor]+'</strong>')+epex;
+    fb.innerHTML=(sv.ok?'✓ Risposta corretta!':'✗ Risposta errata')+epex;
     fb.style.display='block';
     btn.style.display='none';
   } else {
@@ -635,7 +635,7 @@ function renderExamQ(){
       $('eo'+cor).classList.add('correct-ans');
       if(examSel!==cor) $('eo'+examSel).classList.add('wrong-ans');
       fb.className='feedback '+(examSel===cor?'ok':'err');
-      fb.textContent=examSel===cor?'✓ Risposta corretta!':'✗ Errata. Corretta: '+q[2][cor];
+      fb.textContent=examSel===cor?'✓ Risposta corretta!':'✗ Risposta errata';
       fb.style.display='block';
       const isLast=examIdx===examPool.length-1;
       btn.textContent=isLast?'Vedi risultato →':'Prossima →';
@@ -680,7 +680,7 @@ function confirmExam(){
   const fb = $('ex-feedback');
   fb.className = 'feedback ' + (ok ? 'ok' : 'err');
   const expTextEx=EXP[q[0]]?`<div class="exp-text">💡 ${EXP[q[0]]}</div>`:'';
-  fb.innerHTML=(ok?'✓ Risposta corretta!':'✗ Errata. Corretta: <strong>'+q[2][cor]+'</strong>')+expTextEx;
+  fb.innerHTML=(ok?'✓ Risposta corretta!':'✗ Risposta errata')+expTextEx;
   fb.style.display = 'block';
   const isLast = examIdx === examPool.length - 1;
   $('ex-btn').textContent = isLast ? 'Vedi risultato →' : 'Prossima →';
@@ -850,7 +850,7 @@ function renderQ(){
     }).join('');
     fb.className='feedback '+(sv.ok?'ok':'err');
     const epq=EXP[q[0]]?`<div class="exp-text">💡 ${EXP[q[0]]}</div>`:'';
-    fb.innerHTML=(sv.ok?'✓ Risposta corretta!':'✗ Errata. Corretta: <strong>'+q[2][sv.cor]+'</strong>')+epq;
+    fb.innerHTML=(sv.ok?'✓ Risposta corretta!':'✗ Risposta errata')+epq;
     fb.style.display='block';
     btn.style.display='none';
   } else {
@@ -866,7 +866,7 @@ function renderQ(){
       $('o'+cor).classList.add('correct-ans');
       if(sel!==cor) $('o'+sel).classList.add('wrong-ans');
       fb.className='feedback '+(sel===cor?'ok':'err');
-      fb.textContent=sel===cor?'✓ Risposta corretta!':'✗ Errata. Corretta: '+q[2][cor];
+      fb.textContent=sel===cor?'✓ Risposta corretta!':'✗ Risposta errata';
       fb.style.display='block';
       btn.textContent='Prossima →';btn.disabled=false;
     } else {
@@ -899,7 +899,7 @@ function confirm_ans(){
   const fb=$('q-feedback');
   fb.className='feedback '+(ok?'ok':'err');
   const expText=EXP[q[0]]?`<div class="exp-text">💡 ${EXP[q[0]]}</div>`:'';
-  fb.innerHTML=(ok?'✓ Risposta corretta!':'✗ Errata. Corretta: <strong>'+q[2][cor]+'</strong>')+expText;
+  fb.innerHTML=(ok?'✓ Risposta corretta!':'✗ Risposta errata')+expText;
   fb.style.display='block';
   $('q-btn').textContent='Prossima →';$('q-btn').disabled=false;
   updateQuizNav();
