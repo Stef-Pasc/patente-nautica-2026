@@ -12,6 +12,9 @@
   gtag('js', new Date());
 
   gtag('config', 'G-G0CE3WZNYX');
+  function track(event, params){
+    if(typeof gtag==='function') gtag('event', event, params||{});
+  }
 </script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
@@ -439,6 +442,7 @@ function goScreen(name){
   ['home','catalog'].forEach(n=>{const b=$('nav-'+n);if(b)b.classList.toggle('active',n===name);});
   if(name==='catalog'){buildCatSecBar();if(catNeedsRender)renderCatalog();}
   if(name==='home'){renderHomeHistory();renderHomeStats();}
+  track('screen_change', {screen_name: name});
   window.scrollTo(0,0);
 }
 
@@ -584,11 +588,17 @@ function startExam(){
   examVelaStart = examType === 'misto' ? EXAM_BASE_N : Infinity;
   examAnswered = []; examViewIdx = 0;
   examStartTime = Date.now();
+  track('exam_start', {exam_type: examType});
   goScreen('exam');
   renderExamQ();
 }
 
-function exitExam(){ if(confirm('Abbandonare la simulazione?')) goScreen('home'); }
+function exitExam(){
+  if(confirm('Abbandonare la simulazione?')){
+    track('exam_abort', {exam_type: examType, questions_done: examIdx, correct: examCorr, wrong: examWrong});
+    goScreen('home');
+  }
+}
 
 function renderExamQ(){
   const viewIdx = examViewIdx;
@@ -665,6 +675,8 @@ function confirmExam(){
   if(examSel===null) return;
   examDone = true;
   const q = examPool[examIdx], cor = q[3], ok = (examSel===cor);
+  const examSec=q[5]?'vela':q[0].split('.').slice(0,3).join('.');
+  track('exam_answer', {question_id: q[0], section: examSec, correct: ok, question_index: examIdx, exam_type: examType});
   document.querySelectorAll('#ex-answers .answer-btn').forEach(b=>b.classList.add('locked'));
   $('eo'+cor).classList.add('correct-ans');
   if(!ok){
@@ -724,6 +736,17 @@ function finishExam(){
   hist.unshift(rec);
   if(hist.length > 30) hist.length = 30;
   localStorage.setItem(EXAM_HISTORY_KEY, JSON.stringify(hist));
+  track('exam_finish', {
+    exam_type: examType,
+    passed: passed,
+    correct: examCorr,
+    wrong: examWrong,
+    base_wrong: examBaseWrong,
+    vela_wrong: examType==='misto' ? examVelaWrong : null,
+    duration_sec: secs,
+    passed_base: passedBase,
+    passed_vela: passedVela
+  });
   showExamResult(rec);
 }
 
@@ -821,12 +844,16 @@ function jumpToSection(i){
 function startQuiz(){
   nCorr=0;nWrong=0;streak=0;
   buildPool();
+  track('quiz_start', {mode, filter, section: selSection||'all', pool_size: pool.length});
   goScreen('quiz');
   const jb=$('jump-sec-btn');
   if(jb) jb.style.display=mode==='order'?'block':'none';
   renderQ();
 }
-function exitQuiz(){goScreen('home');}
+function exitQuiz(){
+  track('quiz_exit', {questions_done: nCorr+nWrong, correct: nCorr, wrong: nWrong});
+  goScreen('home');
+}
 function renderQ(){
   const viewIdx=quizViewIdx;
   const isPast=viewIdx<idx;
@@ -898,6 +925,8 @@ function confirm_ans(){
   if(!ok){$('o'+sel).classList.add('wrong-ans');nWrong++;streak=0;}else{nCorr++;streak++;}
   quizAnswered[idx]={sel,cor,ok};
   saveQuizStats(ok);
+  const sec=q[5]?'vela':q[0].split('.').slice(0,3).join('.');
+  track('quiz_answer', {question_id: q[0], section: sec, correct: ok, question_index: idx});
   updateCounters();
   const fb=$('q-feedback');
   fb.className='feedback '+(ok?'ok':'err');
@@ -970,6 +999,8 @@ function setCatSection(id){
 function onCatSearch(){
   catSearchActive=true;
   catNeedsRender=true; renderCatalog();
+  const q=($('cat-search').value||'').trim();
+  if(q.length>=3) track('catalog_search', {query: q});
 }
 
 function getCatPool(){
