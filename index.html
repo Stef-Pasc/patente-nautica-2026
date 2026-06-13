@@ -3,14 +3,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Patente Nautica — Quiz</title>
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0CE3WZNYX"></script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G0CE3WZNYX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-0CE3WZNYX');
+
+  gtag('config', 'G-G0CE3WZNYX');
 </script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -235,11 +238,11 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
       <div class="exam-type-grid">
         <button class="exam-type-btn sel" id="et-motore" onclick="setExamType('motore')">
           <span class="et-main">🚤 Solo motore</span>
-          <span class="et-sub">20 domande<br>max 4 errori (min 16/20)</span>
+          <span class="et-sub">20 domande</span>
         </button>
         <button class="exam-type-btn" id="et-misto" onclick="setExamType('misto')">
           <span class="et-main">⛵ Motore + vela</span>
-          <span class="et-sub">20+5 domande<br>base max 4 · vela max 1</span>
+          <span class="et-sub">20+5 domande</span>
         </button>
       </div>
       <button class="start-btn exam-start-btn" onclick="startExam()">🎯&nbsp;&nbsp;Avvia simulazione</button>
@@ -323,7 +326,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
     </button></div>
       </div>
 
-      <button class="start-btn" onclick="startQuiz()">▶&nbsp;&nbsp;Inizia quiz</button>
+      <button class="start-btn" onclick="startQuiz()">▶&nbsp;&nbsp;Inizia</button>
       <div class="info-pills">
         <span class="info-pill" id="pill-count">1699 domande motore</span>
         <span class="info-pill">252 domande vela</span>
