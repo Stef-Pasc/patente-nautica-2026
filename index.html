@@ -11,7 +11,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-G0CE3WZNYX');
+  (function(){
+    var k='naut_uid', uid=localStorage.getItem(k);
+    if(!uid){ uid='u'+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem(k,uid); }
+    gtag('config', 'G-G0CE3WZNYX', {user_id: uid});
+    gtag('set', 'user_properties', {anonymous_id: uid});
+  })();
   function track(event, params){
     if(typeof gtag==='function') gtag('event', event, params||{});
   }
