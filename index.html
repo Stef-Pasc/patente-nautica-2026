@@ -378,6 +378,18 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
     <div class="feedback" id="q-feedback" style="display: none;">✗ Risposta errata</div>
     <div class="q-nav"><button class="nav-arrow-btn" id="q-prev-btn" onclick="quizNavPrev()" disabled>← Prec</button><button class="nav-arrow-btn" id="q-next-btn" onclick="quizNavNext()" disabled>Succ →</button></div>
     <button class="confirm-btn" id="q-btn" onclick="handleBtn()" disabled="">Conferma</button>
+
+    <!-- SECTION COMPLETE CARD -->
+    <div id="section-complete" style="display:none;margin-top:8px">
+      <div class="result-card">
+        <div class="res-verdict ok" style="font-size:26px">Sezione completata!</div>
+        <p id="sc-msg" class="res-stats" style="margin-top:12px"></p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:24px">
+          <button class="start-btn" onclick="continueSection()">↺&nbsp;&nbsp;Ricomincia casuale</button>
+          <button class="start-btn" onclick="exitQuiz()" style="background:var(--surface);color:var(--accent);border:1.5px solid var(--accent);box-shadow:none">✕&nbsp;&nbsp;Esci</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- EXAM -->
@@ -21251,7 +21263,7 @@ function exitQuiz(){
 function renderQ(){
   const viewIdx=quizViewIdx;
   const isPast=viewIdx<idx;
-  if(!isPast && idx>=pool.length) buildPool();
+  if(!isPast && idx>=pool.length){ if(!selSection) buildPool(); else return; }
   const q=pool[viewIdx];
   if(mode==='order'){
     const totEl=$('q-tot');
@@ -21330,7 +21342,32 @@ function confirm_ans(){
   $('q-btn').textContent='Prossima →';$('q-btn').disabled=false;
   updateQuizNav();
 }
-function next(){sel=null;done=false;idx++;quizViewIdx=idx;renderQ();window.scrollTo(0,0);}
+function next(){
+  sel=null;done=false;
+  if(selSection && idx===pool.length-1){
+    showSectionComplete();
+    return;
+  }
+  idx++;quizViewIdx=idx;renderQ();window.scrollTo(0,0);
+}
+function showSectionComplete(){
+  const secNames={'1.1.1':'Nomenclatura scafo','1.1.2':'Nomenclatura generale','1.2.1':'Motori e apparati','1.3.1':'Sicurezza','1.3.2':'Radiocomunicazioni','1.4.1':'Manovra','1.4.2':'Ormeggio','1.4.3':'Navigazione costiera','1.5.1':'Colregs','1.6.1':'Meteorologia','1.7.1':'Navigazione strumentale','1.8.1':'Normativa','1.8.2':'Normativa ambientale','vela':'Vela'};
+  const nome = secNames[selSection]||selSection;
+  const pct = pool.length>0 ? Math.round(nCorr/(nCorr+nWrong)*100) : 0;
+  $('sc-msg').innerHTML = `Hai completato tutte le <strong>${pool.length} domande</strong> della sezione <strong>${nome}</strong>.<br><br>Risultato: <strong>${nCorr} corrette</strong> e ${nWrong} errate su ${nCorr+nWrong} risposte date (${pct}%).`;
+  ['q-card','q-answers','q-feedback','q-nav','q-btn'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
+  $('section-complete').style.display='block';
+  window.scrollTo(0,0);
+}
+function continueSection(){
+  $('section-complete').style.display='none';
+  ['q-card','q-feedback','q-btn'].forEach(id=>{const el=$(id);if(el)el.style.display='';});
+  const nav=$('q-nav');if(nav)nav.style.display='';
+  nCorr=0;nWrong=0;streak=0;
+  buildPool();
+  renderQ();
+  window.scrollTo(0,0);
+}
 function updateQuizNav(){const p=$('q-prev-btn');if(p)p.disabled=(quizViewIdx<=0);const n=$('q-next-btn');if(n)n.disabled=(quizViewIdx>=idx);}
 function quizNavPrev(){if(quizViewIdx>0){quizViewIdx--;renderQ();window.scrollTo(0,0);}}
 function quizNavNext(){if(quizViewIdx<idx){quizViewIdx++;renderQ();window.scrollTo(0,0);}}
