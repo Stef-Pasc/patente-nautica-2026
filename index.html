@@ -399,6 +399,7 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
         <div class="counter prog">Dom. <span id="ex-qnum">1</span>/<span id="ex-qtot">30</span></div>
         <div class="counter ok">✓&nbsp;<span id="ex-corr">0</span></div>
         <div class="counter err" id="ex-err-counter">✗&nbsp;<span id="ex-wrong">0</span>/<span id="ex-maxerr">4</span></div>
+        <div class="counter tot" id="ex-timer">⏱ 00:00</div>
       </div>
       <button class="exit-btn" onclick="exitExam()">✕ Esci</button>
     </div>
@@ -20354,7 +20355,7 @@ const EXP = {
   "1.7.1.276": "La navigazione costiera per definizione normativa richiede il contatto visivo con la costa e l'identificazione di elementi terrestri cospicui per la determinazione della posizione.",
   "1.7.1.277": "22,5° è Nord-Nord Est dal faro; invertendo di 180° si ottiene 202,5°, che corrisponde a Sud-Sud Ovest.",
   "1.7.1.278": "67,5° è Est-Nord Est dal faro; invertendo di 180° si ottiene 247,5°, corrispondente a Ovest-Sud Ovest.",
-  "1.7.1.279": "Se navigo verso Ovest (290° nella rotta vera) e il faro è sulla prora, il rilevamento del faro è nella stessa direzione: 270° (Ovest).",
+  "1.7.1.279": "Se navigo verso Ovest (270° nella rotta vera) e il faro è sulla prora, il rilevamento del faro è nella stessa direzione: 270° (Ovest).",
   "1.7.1.280": "Il campanile è un elemento terrestre ben visibile dal mare, facilmente identificabile e riconoscibile, quindi qualifica come punto cospicuo per la navigazione costiera.",
   "1.7.1.281": "Un singolo luogo di posizione rappresenta un insieme infinito di punti (linea o curva); il punto nave si determina all'intersezione di almeno due luoghi di posizione distinti.",
   "1.7.1.282": "Conoscendo il rilevamento si definisce una linea, conoscendo la distanza si definisce un cerchio: l'intersezione di questi due luoghi geometrici determina un punto univoco.",
@@ -20966,6 +20967,15 @@ const EXAM_HISTORY_KEY = 'naut_exam_history';
 let examType = 'motore';
 let examPool = [], examIdx = 0, examSel = null, examDone = false;
 let examCorr = 0, examWrong = 0, examAborted = false, examStartTime = 0;
+let examTimerInterval = null;
+function startExamTimer(){
+  const el=$('ex-timer');
+  examTimerInterval = setInterval(()=>{
+    const s=Math.floor((Date.now()-examStartTime)/1000);
+    el.textContent='⏱ '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },1000);
+}
+function stopExamTimer(){ clearInterval(examTimerInterval); examTimerInterval=null; }
 let examBaseWrong = 0, examVelaWrong = 0, examVelaStart = Infinity;
 let examAnswered = [], examViewIdx = 0;
 
@@ -20995,12 +21005,15 @@ function startExam(){
   examAnswered = []; examViewIdx = 0;
   examStartTime = Date.now();
   track('exam_start', {exam_type: examType});
+  $('ex-timer').textContent='⏱ 00:00';
   goScreen('exam');
+  startExamTimer();
   renderExamQ();
 }
 
 function exitExam(){
   if(confirm('Abbandonare la simulazione?')){
+    stopExamTimer();
     track('exam_abort', {exam_type: examType, questions_done: examIdx, correct: examCorr, wrong: examWrong});
     goScreen('home');
   }
@@ -21123,6 +21136,7 @@ function examNavPrev(){if(examViewIdx>0){examViewIdx--;renderExamQ();window.scro
 function examNavNext(){if(examViewIdx<examIdx){examViewIdx++;renderExamQ();window.scrollTo(0,0);}}
 
 function finishExam(){
+  stopExamTimer();
   const total = examPool.length;
   const passedBase = examBaseWrong <= EXAM_BASE_MAX_ERRORS;
   const passedVela = examType === 'misto' ? examVelaWrong <= EXAM_VELA_MAX_ERRORS : null;
