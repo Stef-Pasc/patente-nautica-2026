@@ -21314,6 +21314,8 @@ function exitQuiz(){
   goScreen('home');
 }
 function renderQ(){
+  $('section-complete').style.display='none';
+  const qcard=$('q-card');if(qcard)qcard.style.display='';
   const viewIdx=quizViewIdx;
   const isPast=viewIdx<idx;
   if(!isPast && idx>=pool.length){ if(!selSection) buildPool(); else return; }
@@ -21408,7 +21410,7 @@ function showSectionComplete(){
   const nome = secNames[selSection]||selSection;
   const pct = pool.length>0 ? Math.round(nCorr/(nCorr+nWrong)*100) : 0;
   $('sc-msg').innerHTML = `Hai completato tutte le <strong>${pool.length} domande</strong> della sezione <strong>${nome}</strong>.<br><br>Risultato: <strong>${nCorr} corrette</strong> e ${nWrong} errate su ${nCorr+nWrong} risposte date (${pct}%).`;
-  ['q-card','q-answers','q-feedback','q-nav','q-btn'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
+  ['q-card','q-answers','q-feedback','q-btn'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   $('section-complete').style.display='block';
   window.scrollTo(0,0);
 }
