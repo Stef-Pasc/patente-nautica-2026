@@ -243,22 +243,6 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
   <!-- HOME -->
   <div id="screen-home" class="screen">
 
-    <!-- STATS BAR -->
-    <div class="home-stats-bar">
-      <div class="stat-card">
-        <div class="stat-val" id="hs-total">—</div>
-        <div class="stat-label">domande<br>fatte</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="hs-pct">—</div>
-        <div class="stat-label">risposte<br>corrette</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="hs-streak">—</div>
-        <div class="stat-label">🔥 miglior<br>streak</div>
-      </div>
-    </div>
-
     <!-- SIMULAZIONE ESAME -->
     <div class="home-card">
       <div class="card-section-title">🎯 Simulazione esame</div>
@@ -368,6 +352,21 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
         <span class="info-pill" id="pill-count">1699 domande motore</span>
         <span class="info-pill">252 domande vela</span>
         <span class="info-pill">118 con figura</span>
+      </div>
+      <!-- STATS BAR -->
+      <div class="home-stats-bar" style="margin-top:16px;margin-bottom:0">
+        <div class="stat-card">
+          <div class="stat-val" id="hs-total">—</div>
+          <div class="stat-label">domande<br>fatte</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="hs-pct">—</div>
+          <div class="stat-label">risposte<br>corrette</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="hs-streak">—</div>
+          <div class="stat-label">🔥 miglior<br>streak</div>
+        </div>
       </div>
     </div>
   </div>
@@ -5865,7 +5864,7 @@ const ORIG = [
     "1.4.2.2",
     "Quali tra questi fattori dovranno essere tenuti in considerazione prima di dare fondo all'ancora?",
     [
-      "il rapporto tra la lunghezza dell'unità navale e le lunghezze di catena da filare in relazione. all'altezza minima e massima delle onde.",
+      "il rapporto tra la lunghezza dell'unità navale e le lunghezze di catena da filare in relazione all'altezza minima e massima delle onde.",
       "la distanza tra il verricello dell'ancora e il livello medio del mare, nonché l'altezza minima delle onde.",
       "La presenza di possibili divieti nonché la situazione meteomarina locale."
     ],
