@@ -451,6 +451,16 @@ header{position:sticky;top:0;z-index:10;background:rgba(247,248,250,0.95);backdr
   </div>
 
 
+  <!-- REVIEW -->
+  <div id="screen-review" class="screen">
+    <div class="result-card" id="review-summary"></div>
+    <div id="review-list"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+      <button class="start-btn" id="review-restart-btn" onclick="restartSection()" style="display:none">↺&nbsp;&nbsp;Ricomincia sezione</button>
+      <button class="start-btn" onclick="goScreen('home')" style="background:var(--surface);color:var(--accent);border:1.5px solid var(--accent);box-shadow:none">← Torna alla home</button>
+    </div>
+  </div>
+
   <!-- CATALOG -->
   <div id="screen-catalog" class="screen">
     <!-- Sezione tabs scrollabili -->
@@ -1613,7 +1623,7 @@ const ORIG = [
   ],
   [
     "1.1.2.32",
-    "Ruotando la ruota a sinistra nel moto in avanti; accade che la:",
+    "Ruotando la ruota a sinistra nel moto in avanti, accade che la:",
     [
       "prora vada a sinistra.",
       "prora vada a dritta.",
@@ -5883,7 +5893,7 @@ const ORIG = [
     "1.4.2.4",
     "Quando viene utilizzato di massima l'ormeggio su di un ancora o a ruota?",
     [
-      "in presenza di condimeteo particolarmente avverse.",
+      "in presenza di condizioni meteo particolarmente avverse.",
       "negli specchi d'acqua caratterizzati da un adeguato spazio libero intorno.",
       "con una quantità di catena tale da farla risultare a picco."
     ],
@@ -6985,9 +6995,31 @@ const ORIG = [
     [
       "una torcia di sicurezza a luce bianca.",
       "fanale in testa d'albero con luce di colore rosso.",
-      "fuochi a mano a luce rossa, da usare all'occorrenza. Il fascio luminoso del fanale di coronamento in navigazione notturna è:"
+      "fuochi a mano a luce rossa, da usare all'occorrenza."
     ],
     0,
+    null
+  ],
+  [
+    "1.5.1.7",
+    "Il fascio luminoso del fanale di coronamento in navigazione notturna è/",
+    [
+      "ampio 135 gradi verso prora, centrato. sull'asse longitudinale",
+      "ampio 135 gradi verso poppa, centrato. sull'asse longitudinale",
+      "ampio 225 gradi verso poppa, centrato. sull'asse longitudinale"
+    ],
+    1,
+    null
+  ],
+  [
+    "1.5.1.8",
+    "I fanali laterali hanno un settore di visibilità ampio:",
+    [
+      "112,5 gradi misurati a partire dall'asse longitudinale dell'unità verso proravia a dritta e a sinistra.",
+      "112,5 gradi misurati a partire dall'asse longitudinale dell'unità verso poppavia a dritta e a sinistra.",
+      "122,5 gradi misurati a partire dall'asse longitudinale dell'unità verso poppavia a dritta e a sinistra."
+    ],
+    1,
     null
   ],
   [
@@ -12767,9 +12799,9 @@ const ORIG = [
   ],
   [
     "1.7.1.175",
-    "Dovendo effettuare un atterraggio, a conclusione di una navigazione stimata, è opportuno",
+    "Dovendo effettuare un atterraggio, a conclusione di una navigazione stimata, è opportuno considerare che:",
     [
-      "considerare che: la posizione stimata non può differire di oltre mezzo miglio nautico rispetto alla posizione effettiva.",
+      "la posizione stimata non può differire di oltre mezzo miglio nautico rispetto alla posizione effettiva.",
       "la posizione stimata rappresenta di fatto il centro di una zona di incertezza, la cui estensione può risultare anche molto vasta.",
       "la posizione stimata non può differire di oltre un quarto di miglio nautico rispetto alla posizione effettiva."
     ],
@@ -19606,7 +19638,7 @@ function startQuiz(){
 }
 function exitQuiz(){
   track('quiz_exit', {questions_done: nCorr+nWrong, correct: nCorr, wrong: nWrong});
-  goScreen('home');
+  if(quizAnswered.length>0){showReview();}else{goScreen('home');}
 }
 function renderQ(){
   $('section-complete').style.display='none';
@@ -19694,7 +19726,7 @@ function confirm_ans(){
 function next(){
   sel=null;done=false;
   if(selSection && idx===pool.length-1){
-    showSectionComplete();
+    showReview();
     return;
   }
   idx++;quizViewIdx=idx;renderQ();window.scrollTo(0,0);
@@ -19716,6 +19748,49 @@ function continueSection(){
   buildPool();
   renderQ();
   window.scrollTo(0,0);
+}
+function showReview(){
+  const wrongs=quizAnswered.map((ans,i)=>({ans,q:pool[i]})).filter(({ans})=>!ans.ok);
+  const total=quizAnswered.length;
+  const nErr=wrongs.length;
+  const pct=total>0?Math.round(nCorr/total*100):0;
+  let summaryHTML;
+  if(nErr===0){
+    summaryHTML=`<div class="res-verdict ok" style="font-size:26px">Perfetto!</div>
+      <p class="res-stats" style="margin-top:12px">Nessun errore su <strong>${total}</strong> domande risposte.</p>`;
+  }else{
+    summaryHTML=`<div class="res-verdict err" style="font-size:26px">${nErr} ${nErr===1?'errore':'errori'}</div>
+      <p class="res-stats" style="margin-top:12px"><strong>${nCorr}</strong> corrette e <strong>${nErr}</strong> errate su ${total} risposte (${pct}%).</p>`;
+  }
+  $('review-summary').innerHTML=summaryHTML;
+  const rb=$('review-restart-btn');
+  if(rb) rb.style.display=selSection?'':'none';
+  const L=['A','B','C'];
+  $('review-list').innerHTML=wrongs.map(({ans,q})=>{
+    const isVela=!!q[5];
+    const answers=q[2].map((a,i)=>{
+      let cls='answer-btn locked';
+      if(i===ans.cor) cls+=' correct-ans';
+      else if(i===ans.sel) cls+=' wrong-ans';
+      return `<button class="${cls}"><div class="ans-letter">${L[i]}</div><div class="ans-text">${a}</div></button>`;
+    }).join('');
+    const img=q[4]?`<div class="q-image"><img src="${q[4]}" alt="figura"></div>`:'';
+    return `<div class="q-card" style="margin-bottom:10px">
+      <div class="q-meta">${q[0]}${isVela?' <span class="vela-badge">VELA V/F</span>':''}</div>
+      <div class="q-text">${q[1]}</div>${img}
+      <div class="answers" style="margin-top:12px">${answers}</div>
+    </div>`;
+  }).join('');
+  goScreen('review');
+  window.scrollTo(0,0);
+}
+function restartSection(){
+  nCorr=0;nWrong=0;streak=0;
+  buildPool();
+  goScreen('quiz');
+  const jb=$('jump-sec-btn');
+  if(jb) jb.style.display='block';
+  renderQ();
 }
 function updateQuizNav(){const p=$('q-prev-btn');if(p)p.disabled=(quizViewIdx<=0);const n=$('q-next-btn');if(n)n.disabled=(quizViewIdx>=idx);}
 function quizNavPrev(){if(quizViewIdx>0){quizViewIdx--;renderQ();window.scrollTo(0,0);}}
